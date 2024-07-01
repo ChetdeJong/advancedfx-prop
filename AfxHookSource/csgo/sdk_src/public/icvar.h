@@ -129,9 +129,9 @@ public:
 	virtual bool			HasQueuedMaterialThreadConVarSets() const = 0;
 	virtual int				ProcessQueuedMaterialThreadConVarSets() = 0;
 
-	virtual void			UnknownFunc1() = 0;
-	virtual void			UnknownFunc2() = 0;
-	virtual void			UnknownFunc3() = 0;
+	virtual void			UnknownFunc1() = 0; // not in CSCO
+	virtual void			UnknownFunc2() = 0; // not in CSCO
+	virtual void			UnknownFunc3() = 0; // not in CSCO
 
 protected:	class ICVarIteratorInternal;
 public:
@@ -179,9 +179,18 @@ protected:
 	friend class Iterator;
 };
 
+extern bool IsSurceSdkVerCsCo(); // hack hack hack.
+
 inline ICvar::Iterator::Iterator(ICvar *icvar)
 {
-	m_pIter = icvar->FactoryInternalIterator();
+	if(IsSurceSdkVerCsCo()) {
+		ICVarIteratorInternal	* ( __fastcall * pFnCsCo)(void * This, void * Edx) = (ICVarIteratorInternal	* ( __fastcall *)(void *, void *))(
+			(*(void***)icvar)[42]
+		);
+		m_pIter = pFnCsCo(icvar,0);
+	} else {
+		m_pIter = icvar->FactoryInternalIterator();
+	}
 }
 
 inline ICvar::Iterator::~Iterator( void )
